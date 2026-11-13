@@ -1,0 +1,21 @@
+.tree,
+.parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.parts {
+  margin-left: 1.25rem;
+  padding-left: 1rem;
+  border-left: 3px dashed #c9bfa8;
+}
+
+.node {
+  margin: 0.5rem 0;
+}
+
+.note {
+  margin: 0.25rem 0 0 1.25rem;
+  font-style: italic;
+}
