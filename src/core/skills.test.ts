@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { doAction, runSkill, doSkill } from './skills.ts'
-import type { RunFailure, RunResult } from './skills.ts'
+import { addStep, doAction, doSkill, removeStep, runSkill } from './skills.ts'
+import type { RunFailure, RunResult, SkillBook } from './skills.ts'
 import { riverSkillBook, riverWorld } from './test-fixtures.ts'
 
 function failureOf(result: RunResult): RunFailure {
@@ -80,4 +80,40 @@ test('runSkill never changes the book or the world it was given', () => {
 
   expect(book).toEqual(riverSkillBook())
   expect(world).toEqual(riverWorld())
+})
+
+describe('teaching Robo', () => {
+  const look = doAction({ kind: 'look' })
+  const goToForest = doAction({ kind: 'move', to: 'forest' })
+
+  test('adding a step to a new skill teaches Robo that skill', () => {
+    expect(addStep({}, 'find a log', goToForest)).toEqual({ 'find a log': [goToForest] })
+  })
+
+  test('adding a step puts it at the end', () => {
+    const book = addStep({ 'find a log': [goToForest] }, 'find a log', look)
+
+    expect(book['find a log']).toEqual([goToForest, look])
+  })
+
+  test('removing a step takes out only that step', () => {
+    const book = removeStep({ 'find a log': [goToForest, look] }, 'find a log', 0)
+
+    expect(book).toEqual({ 'find a log': [look] })
+  })
+
+  test('removing the last step makes Robo forget the skill', () => {
+    const book = removeStep({ 'find a log': [look], other: [look] }, 'find a log', 0)
+
+    expect(book).toEqual({ other: [look] })
+  })
+
+  test('never changes the book it was given', () => {
+    const book: SkillBook = { 'find a log': [goToForest] }
+
+    addStep(book, 'find a log', look)
+    removeStep(book, 'find a log', 0)
+
+    expect(book).toEqual({ 'find a log': [goToForest] })
+  })
 })

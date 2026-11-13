@@ -43,6 +43,25 @@ export type RunResult =
 export const doAction = (action: Action): Step => ({ kind: 'action', action })
 export const doSkill = (skill: SkillId): Step => ({ kind: 'skill', skill })
 
+/** Returns a copy of the book with a step added to the end of a skill. Teaches Robo the skill if it was new. */
+export function addStep(book: SkillBook, skill: SkillId, step: Step): SkillBook {
+  const steps: Step[] = book[skill] ?? []
+  return { ...book, [skill]: [...steps, step] }
+}
+
+/**
+ * Returns a copy of the book with one step taken out of a skill.
+ * A skill left with no steps is forgotten, so Robo asks about it again.
+ */
+export function removeStep(book: SkillBook, skill: SkillId, index: number): SkillBook {
+  const remaining = (book[skill] ?? []).filter((_, i) => i !== index)
+  if (remaining.length > 0) return { ...book, [skill]: remaining }
+
+  const copy = { ...book }
+  delete copy[skill]
+  return copy
+}
+
 /**
  * Runs a skill from the book against a world, one basic action at a time,
  * and stops at the first failure. Never changes the book or the world it was given.

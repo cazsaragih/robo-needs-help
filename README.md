@@ -39,6 +39,7 @@ The code is split into three layers. Each layer only depends on the ones above i
 | `src/core/` | Skill tree, world model, and the interpreter that runs a skill tree against a world | No |
 | `src/levels/` | Levels described as plain data | No |
 | `src/components/` | Reusable UI parts: skill card, skill tree, world view, Robo | Yes |
+| `src/screens/` | Screens that hold the game's state and connect components to the core | Yes |
 
 *(These folders are added as each part is built.)*
 
@@ -54,6 +55,8 @@ The code is split into three layers. Each layer only depends on the ones above i
 - **A level is data: a goal, a starting world, a target and the cards on offer.** The target describes what the world must look like at the end (where Robo is, where items are). A run can then end three ways: solved, stuck (a step failed), or not there yet (every step worked but the target wasn't reached). The last one matters for teaching: the plan runs, it just doesn't do what was needed.
 - **Failures are codes, not sentences** (`pathBlocked`, `handsFull`, …). The core says what went wrong; the UI decides how to tell a five-year-old, in words, icons and voice.
 - **Components take everything through props and know nothing about levels.** `SkillTree` is given a skill book, a goal and which steps to highlight; `SkillCard` is given one step. Either could be dropped into another product.
+- **Data flows down, events flow up.** Components never change the skill book themselves. `SkillTree` reports "the child tapped this skill" or "remove step 1 of 'find a log'" through callback props; the screen decides what that means and updates its state. A component given no callbacks draws no buttons, so the same tree works as a read-only view elsewhere.
+- **State lives in one place, the screen, and every change to it is a pure core function.** `LevelScreen` holds the child's skill book and which skill is being taught. Adding and removing steps are `addStep` and `removeStep` in the core, which return a new book, so the editing rules are tested without rendering anything.
 - **Words and icons live in the UI layer, not the core** (`cardText.ts`). The core says `{ kind: 'move', to: 'forest' }`; the UI says "Go to the forest" with a tree icon. Translation and voice-over will attach there.
 - **Each component has its own CSS Module**, so class names are scoped to the component and can't clash with a host product's styles.
 - **Accessibility is built into the components:** the step Robo is doing is marked `aria-current="step"`; a failed step has text that screen readers read out, not just a red border; icons are hidden from screen readers because the label already says the same thing; cards are at least 48px tall for small fingers.

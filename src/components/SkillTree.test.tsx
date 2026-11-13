@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { expect, test, vi } from 'vitest'
 import { doSkill } from '../core/skills.ts'
 import { riverSkillBook } from '../core/test-fixtures.ts'
 import { SkillTree } from './SkillTree.tsx'
@@ -38,4 +39,38 @@ test('marks the step Robo is doing and the step where it got stuck', () => {
 
   expect(screen.getByText('Go to the forest').parentElement).toHaveAttribute('aria-current', 'step')
   expect(screen.getByText('(Robo got stuck here)').parentElement).toHaveTextContent('Pick up the log')
+})
+
+test('has no buttons unless it is given something to call', () => {
+  render(<SkillTree book={riverSkillBook()} goal="cross the river" />)
+
+  expect(screen.queryAllByRole('button')).toEqual([])
+})
+
+test('lets the child choose which skill to teach', async () => {
+  const user = userEvent.setup()
+  const onTeach = vi.fn()
+  render(<SkillTree book={riverSkillBook()} goal="cross the river" teaching="find a log" onTeach={onTeach} />)
+
+  expect(screen.getByRole('button', { name: 'Find a log' })).toHaveAttribute('aria-pressed', 'true')
+
+  await user.click(screen.getByRole('button', { name: 'Walk across' }))
+
+  expect(onTeach).toHaveBeenCalledWith('walk across')
+})
+
+test('lets the child remove a step, saying which skill and which step', async () => {
+  const user = userEvent.setup()
+  const onRemove = vi.fn()
+  render(<SkillTree book={riverSkillBook()} goal="cross the river" onRemove={onRemove} />)
+
+  await user.click(screen.getByRole('button', { name: 'Remove Look around' }))
+
+  expect(onRemove).toHaveBeenCalledWith('find a log', 1)
+})
+
+test('the goal itself cannot be removed', () => {
+  render(<SkillTree book={riverSkillBook()} goal="cross the river" onRemove={() => {}} />)
+
+  expect(screen.queryByRole('button', { name: 'Remove Cross the river' })).not.toBeInTheDocument()
 })

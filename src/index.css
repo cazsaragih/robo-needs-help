@@ -22,6 +22,21 @@ main {
   padding: 1rem;
 }
 
+button:focus-visible {
+  outline: 3px solid #1f2430;
+  outline-offset: 3px;
+}
+
+.card-button {
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 .card-tray {
   display: flex;
   flex-wrap: wrap;

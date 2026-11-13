@@ -12,7 +12,7 @@ type SkillCardProps = {
 /** One step shown as a card: an icon and a label. Idea cards and action cards look different. */
 export function SkillCard({ step, state = 'idle' }: SkillCardProps) {
   return (
-    <div
+    <span
       className={styles.card}
       data-kind={step.kind}
       data-state={state}
@@ -23,6 +23,6 @@ export function SkillCard({ step, state = 'idle' }: SkillCardProps) {
       </span>
       <span>{cardLabel(step)}</span>
       {state === 'failed' && <span className={styles.screenReaderOnly}>(Robo got stuck here)</span>}
-    </div>
+    </span>
   )
 }

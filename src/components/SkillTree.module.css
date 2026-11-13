@@ -15,7 +15,44 @@
   margin: 0.5rem 0;
 }
 
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .note {
   margin: 0.25rem 0 0 1.25rem;
   font-style: italic;
+}
+
+.teach,
+.remove {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.teach {
+  border-radius: 1rem;
+}
+
+/* The skill the child is teaching right now. */
+.teach[aria-pressed='true'] {
+  outline: 4px solid #f2a33a;
+  outline-offset: 2px;
+}
+
+.remove {
+  min-width: 3rem;
+  min-height: 3rem;
+  border-radius: 50%;
+  font-size: 1.25rem;
+}
+
+.remove:hover {
+  background: rgb(0 0 0 / 0.08);
 }
