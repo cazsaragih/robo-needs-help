@@ -4,7 +4,9 @@ A small web game that teaches young children (ages 5 to 8) computational thinkin
 
 Robo is a friendly robot that only knows a few basic actions: move, pick up, put down and look. When a child gives Robo a big goal such as "cross the river", Robo answers "I don't know how to do that. What is it made of?" The child breaks the goal into smaller steps, and keeps breaking those down until every step is something Robo already knows. Then Robo acts it out, the child sees exactly where it goes wrong, and fixes it.
 
-> Status: three playable levels. Still to come: voice-over for children who can't read yet, and a public link to play it.
+**▶ Play it: [cazsaragih.github.io/robo-needs-help](https://cazsaragih.github.io/robo-needs-help/)**
+
+> Status: three playable levels. Still to come: voice-over for children who can't read yet.
 
 ## The three levels
 
@@ -85,6 +87,7 @@ The code is split into three layers. Each layer only depends on the ones above i
 - **Children pick steps from cards; they do not type.** The target age is 5 to 8, where many children cannot read or type fluently. Every card has an icon, a text label and voice-over.
 - **TypeScript strict mode** is on, so missing cases and possible `null` values are caught at compile time.
 - **Tests run in CI on every push** (lint, tests, type-check and build) using GitHub Actions.
+- **Every push to `main` that passes CI is published to GitHub Pages** by a deploy job that only runs after the checks succeed, so a broken build never goes live. Vite builds with relative paths, so the game works from the `/robo-needs-help/` folder without hard-coding it.
 
 ## Tech
 
