@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cardLabel } from '../components/cardText.ts'
 import { RoboSays } from '../components/RoboSays.tsx'
 import { roboSays } from '../components/roboSpeech.ts'
@@ -41,6 +41,7 @@ export function LevelScreen({
 }: LevelScreenProps) {
   const [teaching, setTeaching] = useState<SkillId>(level.goal)
   const [run, setRun] = useState<Run | null>(null)
+  const stage = useRef<HTMLDivElement>(null)
 
   const playing = run !== null && run.shown < run.outcome.steps.length
   const finished = run !== null && !playing
@@ -57,6 +58,16 @@ export function LevelScreen({
   useEffect(() => {
     if (solved) onSolved?.()
   }, [solved, onSolved])
+
+  function go() {
+    setRun({ outcome: playLevel(level, book), shown: 0 })
+
+    // On narrow screens the map isn't pinned, so bring it into view to watch Robo.
+    if (window.matchMedia?.('(max-width: 899px)').matches) {
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      stage.current?.scrollIntoView?.({ behavior: calm ? 'auto' : 'smooth', block: 'start' })
+    }
+  }
 
   /** Any change to the plan clears the last run, so old highlights never point at the wrong card. */
   function changeBook(next: SkillBook) {
@@ -110,7 +121,7 @@ export function LevelScreen({
 
   return (
     <div className="level">
-      <div className="stage">
+      <div className="stage" ref={stage}>
         <WorldView
           world={shownWorld}
           map={level.map}
@@ -130,7 +141,7 @@ export function LevelScreen({
               type="button"
               className="go-button"
               disabled={playing}
-              onClick={() => setRun({ outcome: playLevel(level, book), shown: 0 })}
+              onClick={go}
             >
               <span aria-hidden="true">▶</span> Go!
             </button>

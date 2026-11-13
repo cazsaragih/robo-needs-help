@@ -47,4 +47,28 @@ test('levels unlock in order, and a skill taught in level 2 is ready in level 3'
 
   expect(plan().getByText('✓ Robo already knows this')).toBeInTheDocument()
   expect(plan().queryByText('Find a log')).not.toBeInTheDocument()
+
+  // Finish level 3, and the whole game is done.
+  expect(screen.queryByRole('heading', { name: 'You helped Robo with everything!' })).not.toBeInTheDocument()
+  await teach('Plant a garden', 'Find the seeds', 'Plant the seeds')
+  await teach('Find the seeds', 'Go to the shed', 'Look around')
+  await teach('Plant the seeds', 'Pick up the seeds', 'Go to the other side', 'Go to the garden', 'Put down')
+  await user.click(screen.getByRole('button', { name: 'Go!' }))
+
+  const finale = within(await screen.findByRole('region', { name: 'You helped Robo with everything!' }))
+  expect(finale.getByText('10 skills')).toBeInTheDocument() // 3 + 4 + 3 taught across the levels
+  expect(finale.getByText('cross the river')).toBeInTheDocument()
+
+  // Starting over asks first, then forgets everything.
+  await user.click(finale.getByRole('button', { name: 'Start over' }))
+  await user.click(finale.getByRole('button', { name: 'No, keep it' }))
+  expect(screen.getByRole('button', { name: 'Level 3, done' })).toBeInTheDocument()
+
+  await user.click(finale.getByRole('button', { name: 'Start over' }))
+  await user.click(finale.getByRole('button', { name: 'Yes, start over' }))
+
+  expect(screen.queryByRole('region', { name: 'You helped Robo with everything!' })).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Help Robo post the letter' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Level 2, locked' })).toBeDisabled()
+  expect(plan().getByText('❓ What is that made of?')).toBeInTheDocument()
 })
