@@ -45,6 +45,9 @@ The code is split into three layers. Each layer only depends on the ones above i
 ### Decisions so far
 
 - **The core is pure TypeScript with no React.** The interpreter is a function from a world and an action to a new world or a failure. Running a skill tree produces a list of steps, and the UI only plays that list back. This makes the game logic deterministic and easy to test without rendering anything.
+- **The world is a few named places joined by paths, not a grid.** A path can need an item to be in place before it opens (a log on the riverbank opens the way across). One rule covers bridges, keys and similar puzzles, and it keeps the problems everyday ones.
+- **Actions never change the world they are given; they return a new one.** Every step of a run can be kept, compared and replayed, and tests need no setup or cleanup between steps.
+- **Failures are codes, not sentences** (`pathBlocked`, `handsFull`, …). The core says what went wrong; the UI decides how to tell a five-year-old, in words, icons and voice.
 - **Children pick steps from cards; they do not type.** The target age is 5 to 8, where many children cannot read or type fluently. Every card has an icon, a text label and voice-over.
 - **TypeScript strict mode** is on, so missing cases and possible `null` values are caught at compile time.
 - **Tests run in CI on every push** (lint, tests, type-check and build) using GitHub Actions.
