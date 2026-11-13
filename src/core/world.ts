@@ -30,7 +30,7 @@ export type Action =
   | { kind: 'putDown' }
   | { kind: 'look' }
 
-/** Codes, not sentences: the UI turns them into words, icons and voice-over. */
+/** Codes, not sentences: the UI turns them into words and icons. */
 export type FailureReason =
   | 'noPath'
   | 'pathBlocked'

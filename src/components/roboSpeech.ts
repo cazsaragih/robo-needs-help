@@ -1,5 +1,5 @@
 // What Robo says after a run. The core reports codes; this turns them into words a
-// young child can follow, and later into voice-over.
+// young child can follow.
 
 import type { Level, LevelOutcome, Target } from '../core/level.ts'
 import type { FailureReason, World } from '../core/world.ts'

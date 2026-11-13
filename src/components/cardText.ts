@@ -1,5 +1,5 @@
 // Words and icons for cards. Kept out of the core, so the core never deals with
-// presentation and the words can later be translated or voiced.
+// presentation and the words can later be translated.
 
 import type { Step } from '../core/skills.ts'
 import type { ItemId, PlaceId } from '../core/world.ts'
