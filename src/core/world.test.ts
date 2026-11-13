@@ -1,20 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { applyAction, carriedItem } from './world.ts'
 import type { Action, FailureReason, World } from './world.ts'
-
-// A tiny version of level 1: the log is hidden in the forest,
-// and the river can only be crossed once the log lies on the riverbank.
-function riverWorld(): World {
-  return {
-    roboAt: 'meadow',
-    items: { log: { at: 'forest', hidden: true } },
-    paths: [
-      { between: ['meadow', 'forest'] },
-      { between: ['meadow', 'riverbank'] },
-      { between: ['riverbank', 'farBank'], needs: { item: 'log', at: 'riverbank' } },
-    ],
-  }
-}
+import { riverWorld } from './test-fixtures.ts'
 
 /** Applies actions in order and fails the test if any of them fails. */
 function after(world: World, ...actions: Action[]): World {
