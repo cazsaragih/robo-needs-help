@@ -1,10 +1,11 @@
-// Level 1: Robo needs to get across the river.
-// The child learns to break a goal into ideas, and ideas into basic actions.
+// Level 2: Robo needs to get across the river.
+// The same pattern as posting the letter, find something and carry it somewhere, with a twist:
+// where the log is put down matters, because there it becomes a bridge.
 
 import type { Level } from '../core/level.ts'
 import { doAction, doSkill } from '../core/skills.ts'
 
-export const level1: Level = {
+export const crossTheRiver: Level = {
   goal: 'cross the river',
   start: {
     roboAt: 'meadow',

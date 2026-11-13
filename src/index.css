@@ -116,14 +116,38 @@ main {
   margin: 1.25rem 0 0.25rem;
 }
 
+.level-chips {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .level-chip {
-  padding: 0.25rem 0.85rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: 0 0.85rem;
+  border: 2px solid var(--line);
   border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.level-chip[aria-current='step'] {
+  border-color: var(--ink);
   background: var(--ink);
   color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
+}
+
+.level-chip:disabled {
+  color: var(--ink-soft);
+  cursor: default;
+  opacity: 0.6;
 }
 
 .level-goal {

@@ -3,7 +3,7 @@
 
 import type { Level, LevelOutcome, Target } from '../core/level.ts'
 import type { FailureReason, World } from '../core/world.ts'
-import { placeName } from './cardText.ts'
+import { isOrAre, placeName } from './cardText.ts'
 
 const whyStuck: Record<FailureReason, string> = {
   noPath: "I can't get there from here.",
@@ -48,10 +48,10 @@ function whatIsMissing(world: World, target: Target): string {
   }
   for (const id of target.seen ?? []) {
     const item = world.items[id]
-    if (item === undefined || item.hidden) return `I can't see a ${id}`
+    if (item === undefined || item.hidden) return `I can't see the ${id}`
   }
   for (const [id, place] of Object.entries(target.items ?? {})) {
-    if (world.items[id]?.at !== place) return `the ${id} isn't at ${placeName(place)}`
+    if (world.items[id]?.at !== place) return `the ${id} ${isOrAre(id)}n't at ${placeName(place)}`
   }
   return "it didn't work out"
 }

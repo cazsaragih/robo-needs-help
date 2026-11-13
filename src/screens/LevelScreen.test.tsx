@@ -1,15 +1,23 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useState } from 'react'
 import { expect, test } from 'vitest'
-import { level1 } from '../levels/level1.ts'
+import type { SkillBook } from '../core/skills.ts'
+import { crossTheRiver } from '../levels/crossTheRiver.ts'
 import { LevelScreen } from './LevelScreen.tsx'
 
 const plan = () => within(screen.getByRole('list', { name: "Robo's plan" }))
 const cards = () => within(screen.getByRole('region', { name: /made of\?$/ }))
 
+/** Holds the skill book, as the game does, so the level screen can be tested on its own. */
+function Harness({ stepDelay }: { stepDelay: number }) {
+  const [book, setBook] = useState<SkillBook>({})
+  return <LevelScreen level={crossTheRiver} book={book} onBookChange={setBook} stepDelay={stepDelay} />
+}
+
 function setUp(stepDelay = 0) {
   const user = userEvent.setup()
-  render(<LevelScreen level={level1} number={1} stepDelay={stepDelay} />)
+  render(<Harness stepDelay={stepDelay} />)
 
   /** Chooses a skill in the plan, then adds cards to it from the tray. */
   async function teach(skill: string, ...cardNames: string[]) {
@@ -89,7 +97,7 @@ test('Robo says what an idea is missing, and the idea is marked', async () => {
 
   await run()
 
-  expect(await screen.findByText('I did "find a log", but I can\'t see a log.')).toBeInTheDocument()
+  expect(await screen.findByText('I did "find a log", but I can\'t see the log.')).toBeInTheDocument()
   expect(plan().getByText('(Robo got stuck here)').parentElement).toHaveTextContent('Find a log')
 })
 
@@ -103,7 +111,7 @@ test('Robo says when every step worked but the goal is not reached', async () =>
   expect(await screen.findByText(/I did every step, but I still haven't managed to cross the river/)).toBeInTheDocument()
 })
 
-test('the child can solve level 1', async () => {
+test('the child can solve the river level', async () => {
   const { teach, run } = setUp()
   await teach('Cross the river', 'Find a log', 'Carry the log to the river', 'Walk across')
   await teach('Find a log', 'Go to the forest', 'Look around')

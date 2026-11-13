@@ -4,7 +4,17 @@ A small web game that teaches young children (ages 5 to 8) computational thinkin
 
 Robo is a friendly robot that only knows a few basic actions: move, pick up, put down and look. When a child gives Robo a big goal such as "cross the river", Robo answers "I don't know how to do that. What is it made of?" The child breaks the goal into smaller steps, and keeps breaking those down until every step is something Robo already knows. Then Robo acts it out, the child sees exactly where it goes wrong, and fixes it.
 
-> Status: early work in progress. The project is set up and tested; the game itself is being built.
+> Status: three playable levels. Still to come: voice-over for children who can't read yet, and a public link to play it.
+
+## The three levels
+
+| Level | Goal | What it adds |
+|---|---|---|
+| 1 | Post the letter | Decomposition, gently: break the goal into two ideas ("find the letter", "carry the letter to the postbox"), and the ideas into actions. Introduces the pattern *find something, then carry it somewhere*. |
+| 2 | Cross the river | The same pattern ("find a log", "carry the log to the river") with a twist: where the log is put down matters, because there it becomes a bridge. Three ideas, and a dead end ("build a boat"). |
+| 3 | Plant a garden | The garden is across the same river. "Cross the river", taught in level 2, is now **one card**: Robo already knows it, so 7 of the 13 actions come for free. |
+
+The progression is *learn a pattern → apply it with a twist → reuse a whole skill*: difficulty rises from level 1 to 2, and level 3 is bigger again but feels lighter because of what the child already taught. Levels unlock in order, so a child always reaches level 3 knowing how to cross the river. (The first version had the river first and the letter second, which made level 2 easier than level 1; swapping them fixed the dip.)
 
 ## What it teaches
 
@@ -39,9 +49,7 @@ The code is split into three layers. Each layer only depends on the ones above i
 | `src/core/` | Skill tree, world model, and the interpreter that runs a skill tree against a world | No |
 | `src/levels/` | Levels described as plain data | No |
 | `src/components/` | Reusable UI parts: skill card, skill tree, world view, Robo | Yes |
-| `src/screens/` | Screens that hold the game's state and connect components to the core | Yes |
-
-*(These folders are added as each part is built.)*
+| `src/screens/` | `Game` (which level is open, which are solved, the shared skill book) and `LevelScreen` (one level: building, running and watching the plan) | Yes |
 
 ### Decisions so far
 
@@ -52,7 +60,11 @@ The code is split into three layers. Each layer only depends on the ones above i
 - **A skill missing from the book is how Robo asks "what is that made of?"** Running a skill Robo hasn't been taught stops with `unknownSkill`, so the same runner handles both decomposing and debugging. A skill that uses itself is reported as a `loop` instead of running forever.
 - **A run returns every action performed, with the world after each one and its place in the tree.** The UI plays this list back at whatever speed it likes and highlights the step that failed; the core knows nothing about animation.
 - **New skill names come from idea cards that each level provides.** Children aged 5 to 8 can't type "find a log", so a level offers a few idea cards (icon, label and voice-over), including some that don't help. The child chooses which ideas a goal is made of, then breaks each idea down further. Choosing and rejecting ideas is the decomposition skill itself, and it keeps the game top-down rather than building up from commands.
-- **Every idea card has a check: what must be true once it's done.** "Find a log" is done when Robo can see a log; "walk across" when Robo is on the other side. When Robo finishes an idea, it checks it, and if the check fails it stops right there and says what's missing ("I did "find a log", but I can't see a log."). Without this, idea names meant nothing: a child could put the whole solution inside "build a boat" and win, skipping decomposition. With it, each idea is a real sub-goal, much like a unit test for a skill, and mistakes are caught in the idea where they happen. The runner only takes a "was this skill done?" callback, so the core still knows nothing about levels.
+- **Every idea card has a check: what must be true once it's done.** "Find a log" is done when Robo can see a log; "walk across" when Robo is on the other side. When Robo finishes an idea, it checks it, and if the check fails it stops right there and says what's missing ("I did "find a log", but I can't see the log."). Without this, idea names meant nothing: a child could put the whole solution inside "build a boat" and win, skipping decomposition. With it, each idea is a real sub-goal, much like a unit test for a skill, and mistakes are caught in the idea where they happen. The runner only takes a "was this skill done?" callback, so the core still knows nothing about levels.
+- **One skill book for the whole game.** `Game` holds it and every level reads and changes the same book, so a skill taught in one level is still known in the next. That is the abstraction lesson: in level 3, "cross the river" is a single card because the child taught it in level 2, and the level 3 river is the same as level 2's so the old skill works unchanged.
+- **Level files are named after what they are** (`postTheLetter.ts`, `crossTheRiver.ts`, `plantAGarden.ts`), and their order lives in one list in `levels/index.ts`. Reordering levels is a one-line change, and "level 1" never means two different things in the code.
+- **Skills learned in earlier levels are drawn folded:** one card with "✓ Robo already knows this", which lights up as a whole while Robo works through it on the map. The child sees their earlier work pay off without a wall of old steps, and can't accidentally edit a finished skill from inside another level.
+- **A new React `key` per level** restarts the level screen when the child moves on, so no run, highlight or chosen skill leaks from one level to the next, while the shared skill book (held above it) stays.
 - **A level is data: a goal, a starting world, a target and the cards on offer.** The target describes what the world must look like at the end (where Robo is, where items are). A run can then end three ways: solved, stuck (a step failed), or not there yet (every step worked but the target wasn't reached). The last one matters for teaching: the plan runs, it just doesn't do what was needed.
 - **Failures are codes, not sentences** (`pathBlocked`, `handsFull`, …). The core says what went wrong; the UI decides how to tell a five-year-old, in words, icons and voice.
 - **Components take everything through props and know nothing about levels.** `SkillTree` is given a skill book, a goal and which steps to highlight; `SkillCard` is given one step. Either could be dropped into another product.

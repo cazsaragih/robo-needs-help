@@ -1,4 +1,4 @@
-// Shared test data: a small version of level 1.
+// Shared test data: a small version of the river level.
 // Each function returns a fresh copy, so one test can never affect another.
 
 import { doAction, doSkill } from './skills.ts'

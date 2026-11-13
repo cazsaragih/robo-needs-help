@@ -19,6 +19,11 @@ type SkillTreeProps = {
   onTeach?: (skill: SkillId) => void
   /** Called when the child removes a step from a skill. Without it, there are no remove buttons. */
   onRemove?: (skill: SkillId, index: number) => void
+  /**
+   * Skills Robo learned in earlier levels. They are drawn folded, as one card, and light up
+   * as a whole while Robo runs any step inside them.
+   */
+  known?: SkillId[]
 }
 
 /** A goal and everything it is made of, drawn by looking up each skill's name in the book. */
@@ -41,15 +46,17 @@ type StepNodeProps = {
 
 /** One card, and for a skill, the steps it is made of underneath. */
 function StepNode({ tree, step, path, inside }: StepNodeProps) {
-  const { book, teaching, onTeach, onRemove } = tree
-  let card: ReactNode = <SkillCard step={step} state={cardState(path, tree)} />
+  const { book, teaching, onTeach, onRemove, known = [] } = tree
+  const parts: Step[] | undefined = step.kind === 'skill' ? book[step.skill] : undefined
+  const folded = step.kind === 'skill' && parts !== undefined && known.includes(step.skill)
+
+  let card: ReactNode = <SkillCard step={step} state={cardState(path, tree, folded)} />
   let below: ReactNode = null
 
   if (step.kind === 'skill') {
     const skill = step.skill
-    const parts: Step[] | undefined = book[skill]
 
-    if (onTeach) {
+    if (onTeach && !folded) {
       card = (
         <button
           type="button"
@@ -66,6 +73,8 @@ function StepNode({ tree, step, path, inside }: StepNodeProps) {
       below = <p className={styles.note}>This uses itself, so Robo would never finish.</p>
     } else if (!parts) {
       below = <p className={styles.note}>❓ What is that made of?</p>
+    } else if (folded) {
+      below = <p className={styles.known}>✓ Robo already knows this</p>
     } else {
       below = (
         <ol className={styles.parts} role="list">
@@ -100,12 +109,20 @@ function StepNode({ tree, step, path, inside }: StepNodeProps) {
   )
 }
 
-function cardState(path: StepPath, { runningPath, failedPath }: SkillTreeProps): CardState {
-  if (failedPath && samePath(path, failedPath)) return 'failed'
-  if (runningPath && samePath(path, runningPath)) return 'running'
+/** A folded card stands for everything inside it, so it also lights up for steps deeper down. */
+function cardState(path: StepPath, { runningPath, failedPath }: SkillTreeProps, folded: boolean): CardState {
+  const marks = (other?: StepPath) =>
+    other !== undefined && (folded ? isInside(other, path) : samePath(other, path))
+  if (marks(failedPath)) return 'failed'
+  if (marks(runningPath)) return 'running'
   return 'idle'
 }
 
 function samePath(a: StepPath, b: StepPath): boolean {
   return a.length === b.length && a.every((n, i) => n === b[i])
+}
+
+/** True when `path` is `outer` or a step somewhere inside it. */
+function isInside(path: StepPath, outer: StepPath): boolean {
+  return outer.length <= path.length && outer.every((n, i) => n === path[i])
 }

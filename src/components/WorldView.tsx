@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import type { MapPoint } from '../core/level.ts'
 import type { Action, ItemId, PlaceId, World } from '../core/world.ts'
 import { carriedItem } from '../core/world.ts'
-import { placeIcon, placeName } from './cardText.ts'
+import { isOrAre, placeIcon, placeName } from './cardText.ts'
 import { RoboHead } from './Robo.tsx'
 import styles from './WorldView.module.css'
 
@@ -186,7 +186,7 @@ function describe(world: World): string {
   const carried = carriedItem(world)
   if (carried) sentences.push(`Robo is carrying the ${carried}.`)
   for (const [id, item] of Object.entries(world.items)) {
-    if (item.at !== null && !item.hidden) sentences.push(`The ${id} is at ${placeName(item.at)}.`)
+    if (item.at !== null && !item.hidden) sentences.push(`The ${id} ${isOrAre(id)} at ${placeName(item.at)}.`)
   }
   return sentences.join(' ')
 }
@@ -201,6 +201,24 @@ function Item({ id }: { id: ItemId }) {
         <line x1={-26} y1={6} x2={42} y2={6} stroke={colours.woodDark} strokeWidth={3} strokeLinecap="round" />
         <ellipse cx={LOG_LENGTH / 2 - 9} cy={0} rx={8} ry={13} fill="#d7a46c" />
         <ellipse cx={LOG_LENGTH / 2 - 9} cy={0} rx={3} ry={6} fill={colours.wood} />
+      </>
+    )
+  }
+  if (id === 'letter') {
+    return (
+      <>
+        <rect x={-24} y={-16} width={48} height={32} rx={4} fill="#ffffff" stroke="#c9b48c" strokeWidth={2} />
+        <path d="M -24 -16 L 0 4 L 24 -16" fill="none" stroke="#c9b48c" strokeWidth={2} />
+        <circle cx={0} cy={4} r={5} fill="#d64545" />
+      </>
+    )
+  }
+  if (id === 'seeds') {
+    return (
+      <>
+        <path d="M -20 18 Q -24 -8 -12 -14 L 12 -14 Q 24 -8 20 18 Z" fill="#c9a46a" stroke="#9a7440" strokeWidth={2} />
+        <rect x={-14} y={-20} width={28} height={8} rx={4} fill="#9a7440" />
+        <path d="M 0 -20 q -10 -14 -18 -10 q 8 8 18 10 q 10 -14 18 -10 q -8 8 -18 10" fill={colours.leafLight} />
       </>
     )
   }
@@ -250,7 +268,7 @@ function Signpost({ id, point, shadow }: { id: PlaceId; point: Point; shadow: st
   const width = placeName(id).length * 14 + 70
   // Keep the sign inside the map, even for a place near the edge.
   const x = Math.min(Math.max(point.x, width / 2 + 8), WIDTH - width / 2 - 8)
-  const y = point.y - 92
+  const y = Math.max(point.y - 92, 34) // stays inside the top edge
   return (
     <g filter={shadow}>
       <path d={`M ${point.x - 10} ${y + 20} L ${point.x} ${y + 34} L ${point.x + 10} ${y + 20} Z`} fill="#ffffff" />
@@ -307,6 +325,47 @@ function Ground({ id, point }: { id: PlaceId; point: Point }) {
       return <ellipse cx={x} cy={y} rx={88} ry={72} fill={colours.meadow} />
     case 'forest':
       return <ellipse cx={x} cy={y} rx={70} ry={58} fill="#7fbf5a" />
+    case 'house':
+      return (
+        <g>
+          <ellipse cx={x} cy={y} rx={80} ry={64} fill="#d8cfbf" />
+          <g transform={`translate(${x - 120} ${y - 30})`}>
+            <rect x={-48} y={-40} width={96} height={80} rx={6} fill="#d9644a" />
+            <rect x={-48} y={-40} width={48} height={80} rx={6} fill="#c4513a" />
+            <rect x={14} y={-30} width={16} height={22} rx={3} fill="#7a3b2e" />
+          </g>
+        </g>
+      )
+    case 'postbox':
+      return (
+        <g>
+          <ellipse cx={x} cy={y} rx={70} ry={56} fill="#d8cfbf" />
+          {/* On the left, so the goal flag on the right never covers it. */}
+          <rect x={x - 92} y={y - 30} width={36} height={44} rx={12} fill="#d64545" />
+          <rect x={x - 84} y={y - 18} width={20} height={5} rx={2.5} fill="#1e2433" />
+        </g>
+      )
+    case 'shed':
+      return (
+        <g>
+          <ellipse cx={x} cy={y} rx={70} ry={56} fill={colours.meadow} />
+          <g transform={`translate(${x - 95} ${y + 10})`}>
+            <rect x={-40} y={-34} width={80} height={68} rx={5} fill={colours.wood} />
+            {[-20, 0, 20].map((dy) => (
+              <line key={dy} x1={-40} y1={dy} x2={40} y2={dy} stroke={colours.woodDark} strokeWidth={3} />
+            ))}
+          </g>
+        </g>
+      )
+    case 'garden':
+      return (
+        <g>
+          <rect x={x - 80} y={y - 50} width={160} height={100} rx={18} fill="#9a6b3f" />
+          {[-28, 0, 28].map((dy) => (
+            <line key={dy} x1={x - 64} y1={y + dy} x2={x + 64} y2={y + dy} stroke="#7d5330" strokeWidth={8} strokeLinecap="round" />
+          ))}
+        </g>
+      )
     default:
       return <ellipse cx={x} cy={y} rx={70} ry={58} fill={colours.meadow} />
   }

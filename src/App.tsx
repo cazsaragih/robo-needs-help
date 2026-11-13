@@ -1,8 +1,12 @@
 import { RoboHead } from './components/Robo.tsx'
-import { level1 } from './levels/level1.ts'
-import { LevelScreen } from './screens/LevelScreen.tsx'
+import { Game } from './screens/Game.tsx'
 
-function App() {
+type AppProps = {
+  /** How long each step stays lit while Robo runs the plan. Tests set it to 0. */
+  stepDelay?: number
+}
+
+function App({ stepDelay }: AppProps) {
   return (
     <>
       <header className="app-header">
@@ -16,7 +20,7 @@ function App() {
         </h1>
       </header>
       <main>
-        <LevelScreen level={level1} number={1} />
+        <Game stepDelay={stepDelay} />
       </main>
     </>
   )

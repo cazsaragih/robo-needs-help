@@ -32,6 +32,13 @@
   font-weight: 700;
 }
 
+/* A skill Robo learned in an earlier level, shown folded. */
+.known {
+  margin: 0.4rem 0 0 1.4rem;
+  color: var(--go-dark);
+  font-weight: 700;
+}
+
 .teach,
 .remove {
   padding: 0;

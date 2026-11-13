@@ -69,6 +69,23 @@ test('lets the child remove a step, saying which skill and which step', async ()
   expect(onRemove).toHaveBeenCalledWith('find a log', 1)
 })
 
+test('folds a skill Robo already knows, and lights it up while Robo runs inside it', () => {
+  const book = { ...riverSkillBook(), 'plant a garden': [doSkill('cross the river')] }
+  render(<SkillTree book={book} goal="plant a garden" known={['cross the river']} runningPath={[0, 1, 0]} />)
+
+  expect(screen.getByText('✓ Robo already knows this')).toBeInTheDocument()
+  expect(screen.queryByText('Find a log')).not.toBeInTheDocument()
+  expect(screen.getByText('Cross the river').parentElement).toHaveAttribute('aria-current', 'step')
+})
+
+test('a known skill cannot be chosen for teaching', () => {
+  const book = { ...riverSkillBook(), 'plant a garden': [doSkill('cross the river')] }
+  render(<SkillTree book={book} goal="plant a garden" known={['cross the river']} onTeach={() => {}} />)
+
+  expect(screen.queryByRole('button', { name: 'Cross the river' })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Plant a garden' })).toBeInTheDocument()
+})
+
 test('the goal itself cannot be removed', () => {
   render(<SkillTree book={riverSkillBook()} goal="cross the river" onRemove={() => {}} />)
 
