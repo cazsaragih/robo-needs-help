@@ -11,12 +11,15 @@ const places: Record<PlaceId, { name: string; icon: string }> = {
   farBank: { name: 'the other side', icon: '🏝️' },
 }
 
+export const placeName = (id: PlaceId): string => places[id]?.name ?? id
+export const placeIcon = (id: PlaceId): string => places[id]?.icon ?? '📍'
+
 export function cardLabel(step: Step): string {
   if (step.kind === 'skill') return step.skill.charAt(0).toUpperCase() + step.skill.slice(1)
 
   switch (step.action.kind) {
     case 'move':
-      return `Go to ${places[step.action.to]?.name ?? step.action.to}`
+      return `Go to ${placeName(step.action.to)}`
     case 'pickUp':
       return `Pick up the ${step.action.item}`
     case 'putDown':
@@ -31,7 +34,7 @@ export function cardIcon(step: Step): string {
 
   switch (step.action.kind) {
     case 'move':
-      return places[step.action.to]?.icon ?? '🚶'
+      return placeIcon(step.action.to)
     case 'pickUp':
       return '✋'
     case 'putDown':

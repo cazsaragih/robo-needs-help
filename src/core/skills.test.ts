@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { addStep, doAction, doSkill, removeStep, runSkill } from './skills.ts'
 import type { RunFailure, RunResult, SkillBook } from './skills.ts'
 import { riverSkillBook, riverWorld } from './test-fixtures.ts'
+import type { World } from './world.ts'
 
 function failureOf(result: RunResult): RunFailure {
   if (result.ok) throw new Error('expected the run to fail')
@@ -80,6 +81,31 @@ test('runSkill never changes the book or the world it was given', () => {
 
   expect(book).toEqual(riverSkillBook())
   expect(world).toEqual(riverWorld())
+})
+
+describe('checking what each skill achieved', () => {
+  const canSeeTheLog = (skill: string, world: World) => skill !== 'find a log' || !world.items.log.hidden
+
+  test('stops at a skill that did not do its job, and points at that skill', () => {
+    const book = riverSkillBook()
+    book['find a log'] = [doAction({ kind: 'move', to: 'forest' })] // forgot to look
+
+    const result = runSkill(book, 'cross the river', riverWorld(), canSeeTheLog)
+
+    expect(failureOf(result)).toEqual({ kind: 'notDone', path: [0], skill: 'find a log' })
+    expect(result.steps).toHaveLength(1)
+  })
+
+  test('checks each skill as soon as its own steps are done, innermost first', () => {
+    const checked: string[] = []
+
+    runSkill(riverSkillBook(), 'cross the river', riverWorld(), (skill) => {
+      checked.push(skill)
+      return true
+    })
+
+    expect(checked).toEqual(['find a log', 'carry the log to the river', 'walk across', 'cross the river'])
+  })
 })
 
 describe('teaching Robo', () => {

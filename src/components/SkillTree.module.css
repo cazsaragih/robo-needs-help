@@ -1,29 +1,35 @@
 .tree,
 .parts {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .parts {
-  margin-left: 1.25rem;
+  margin-left: 1.4rem;
   padding-left: 1rem;
-  border-left: 3px dashed #c9bfa8;
+  border-left: 3px dashed var(--line);
 }
 
 .node {
-  margin: 0.5rem 0;
+  margin: 0.55rem 0;
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
+/* An empty slot where the child still has to say what a skill is made of. */
 .note {
-  margin: 0.25rem 0 0 1.25rem;
-  font-style: italic;
+  display: inline-block;
+  margin: 0.5rem 0 0 1.4rem;
+  padding: 0.35rem 0.85rem;
+  border: 2px dashed var(--idea-edge);
+  border-radius: 0.85rem;
+  color: var(--ink-soft);
+  font-weight: 700;
 }
 
 .teach,
@@ -31,8 +37,8 @@
   padding: 0;
   border: 0;
   background: none;
-  font: inherit;
   color: inherit;
+  font: inherit;
   cursor: pointer;
 }
 
@@ -42,17 +48,23 @@
 
 /* The skill the child is teaching right now. */
 .teach[aria-pressed='true'] {
-  outline: 4px solid #f2a33a;
-  outline-offset: 2px;
+  outline: 4px solid var(--sun);
+  outline-offset: 3px;
 }
 
 .remove {
-  min-width: 3rem;
-  min-height: 3rem;
+  display: grid;
+  flex: none; /* never squeezed below a comfortable tap size by a long card */
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  font-size: 1.25rem;
+  color: var(--ink-soft);
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
 .remove:hover {
-  background: rgb(0 0 0 / 0.08);
+  background: var(--stuck-light);
+  color: var(--stuck);
 }

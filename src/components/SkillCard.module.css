@@ -1,35 +1,70 @@
 .card {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  min-height: 3rem; /* at least 48px: a comfortable target for small fingers */
-  padding: 0.5rem 1rem;
-  border: 3px solid transparent;
+  gap: 0.6rem;
+  min-height: 3.25rem; /* over 48px: a comfortable target for small fingers */
+  padding: 0.35rem 1rem 0.35rem 0.4rem;
+  border: 2px solid;
   border-radius: 1rem;
-  box-shadow: 0 2px 0 rgb(0 0 0 / 0.15);
-  font-weight: 600;
+  box-shadow: 0 4px 0 var(--card-shadow);
+  font-size: 1.05rem;
+  font-weight: 700;
+  transition:
+    transform 80ms ease-out,
+    box-shadow 80ms ease-out;
 }
 
 .card[data-kind='skill'] {
-  background: #fff1c9;
+  --card-shadow: var(--idea-shadow);
+  border-color: var(--idea-edge);
+  background: var(--idea);
 }
 
 .card[data-kind='action'] {
-  background: #d9f2ef;
+  --card-shadow: var(--action-shadow);
+  border-color: var(--action-edge);
+  background: var(--action);
 }
 
 .card[data-state='running'] {
-  border-color: #2b8c86;
+  outline: 4px solid var(--teal);
+  outline-offset: 3px;
+  animation: pulse 900ms ease-in-out infinite;
 }
 
 .card[data-state='failed'] {
-  border-color: #c93c3c;
+  --card-shadow: #b53a3a;
+  border-color: var(--stuck);
   border-style: dashed;
+  background: var(--stuck-light);
 }
 
 .icon {
-  font-size: 1.5rem;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 0.75);
+  font-size: 1.4rem;
   line-height: 1;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card[data-state='running'] {
+    animation: none;
+  }
 }
 
 /* Hidden on screen, still read aloud by screen readers. */

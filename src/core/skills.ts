@@ -34,6 +34,10 @@ export type RunFailure =
   | { kind: 'actionFailed'; path: StepPath; reason: FailureReason }
   | { kind: 'unknownSkill'; path: StepPath; skill: SkillId }
   | { kind: 'loop'; path: StepPath; skill: SkillId }
+  | { kind: 'notDone'; path: StepPath; skill: SkillId }
+
+/** Says whether a skill achieved what it should, judged from the world once its steps are done. */
+export type IsDone = (skill: SkillId, world: World) => boolean
 
 export type RunResult =
   | { ok: true; steps: RunStep[]; world: World }
@@ -65,8 +69,9 @@ export function removeStep(book: SkillBook, skill: SkillId, index: number): Skil
 /**
  * Runs a skill from the book against a world, one basic action at a time,
  * and stops at the first failure. Never changes the book or the world it was given.
+ * If `isDone` is given, each skill is checked with it as soon as its steps are done.
  */
-export function runSkill(book: SkillBook, goal: SkillId, world: World): RunResult {
+export function runSkill(book: SkillBook, goal: SkillId, world: World, isDone?: IsDone): RunResult {
   const steps: RunStep[] = []
   let current = world
 
@@ -91,6 +96,8 @@ export function runSkill(book: SkillBook, goal: SkillId, world: World): RunResul
       current = result.world
       steps.push({ path: stepPath, action: step.action, world: current })
     }
+
+    if (isDone && !isDone(skill, current)) return { kind: 'notDone', path, skill }
     return null
   }
 

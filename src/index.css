@@ -1,9 +1,39 @@
+/* ---------- Design tokens ---------- */
+
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* Colours */
+  --paper: #fff8ec;
+  --paper-dot: #f2e6cf;
+  --panel: #ffffff;
+  --line: #eadfc9;
+  --ink: #1e2433;
+  --ink-soft: #5b6275;
+  --teal: #2a9d8f; /* Robo */
+  --teal-dark: #1d7468;
+  --sun: #f4a23b; /* highlights: the chosen skill, the flag */
+  --idea: #fff1cc;
+  --idea-edge: #e9b949;
+  --idea-shadow: #d39f2c;
+  --action: #e1f5f1;
+  --action-edge: #7cc9bc;
+  --action-shadow: #5aa99c;
+  --go: #2f9e4f;
+  --go-dark: #22773a;
+  --stuck: #d64545;
+  --stuck-light: #ffe7e5;
+
+  /* Shape */
+  --radius: 1.25rem;
+
+  /* Type: Fredoka for headings only; Andika, made for beginning readers, for everything children read. */
+  --font-display: 'Fredoka Variable', system-ui, sans-serif;
+  --font-body: 'Andika', system-ui, sans-serif;
+
+  font-family: var(--font-body);
   font-size: 18px;
   line-height: 1.5;
-  color: #1f2430;
-  background: #fdf8ee;
+  color: var(--ink);
+  background: var(--paper);
 }
 
 *,
@@ -14,27 +44,222 @@
 
 body {
   margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--paper-dot) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
 }
 
-main {
-  max-width: 60rem;
-  margin: 0 auto;
-  padding: 1rem;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 button:focus-visible {
-  outline: 3px solid #1f2430;
+  outline: 4px solid var(--ink);
   outline-offset: 3px;
 }
 
-.card-button {
-  padding: 0;
+/* ---------- App shell ---------- */
+
+.app-header,
+main {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-top: 1.25rem;
+}
+
+.logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 2px solid var(--line);
+  border-radius: 1.1rem;
+  background: var(--panel);
+  box-shadow: 0 4px 0 var(--line);
+}
+
+.logo svg {
+  width: 2.9rem;
+  height: 2.9rem;
+}
+
+.wordmark {
+  margin: 0;
+  font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wordmark .robo {
+  color: var(--teal);
+}
+
+/* ---------- Level ---------- */
+
+.level-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  margin: 1.25rem 0 0.25rem;
+}
+
+.level-chip {
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.level-goal {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+}
+
+.level-goal strong {
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+
+/* A level: the stage (Robo's world and the Go bar) and the workbench (plan and cards). */
+.level {
+  display: grid;
+  gap: 1rem 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* The stage stays pinned to the top, so Robo is always in view while the child works below. */
+.stage {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.75rem 0;
+  background: var(--paper);
+}
+
+/* Side by side on wide screens: watch Robo on the left, build the plan on the right. */
+@media (min-width: 900px) {
+  .level {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .stage {
+    background: transparent;
+  }
+}
+
+/* On short screens, such as a phone on its side, pinning would leave too little room. */
+@media (max-height: 500px) {
+  .stage {
+    position: static;
+  }
+}
+
+.workbench {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.75rem;
+}
+
+.panel {
+  padding: 1rem 1.25rem 1.25rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: 0 4px 0 var(--line);
+}
+
+.panel > h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+}
+
+/* ---------- Go bar ---------- */
+
+.go-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+.go-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 4rem;
+  padding: 0 1.75rem;
   border: 0;
-  border-radius: 1rem;
-  background: none;
-  font: inherit;
-  color: inherit;
+  border-radius: var(--radius);
+  background: var(--go);
+  box-shadow: 0 5px 0 var(--go-dark);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
   cursor: pointer;
+  transition:
+    transform 80ms ease-out,
+    box-shadow 80ms ease-out;
+}
+
+.go-button:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.go-button:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--go-dark);
+}
+
+.go-button:disabled {
+  background: #a3bfaa;
+  box-shadow: 0 5px 0 #86a28d;
+  cursor: default;
+}
+
+/* On phones, a smaller Go button leaves Robo's speech bubble room to breathe. */
+@media (max-width: 600px) {
+  .go-bar {
+    gap: 0.5rem;
+  }
+
+  .go-button {
+    min-height: 3.5rem;
+    padding: 0 1rem;
+    font-size: 1.3rem;
+  }
+}
+
+/* ---------- Card tray ---------- */
+
+.tray-label {
+  margin: 1rem 0 0.5rem;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tray-label:first-of-type {
+  margin-top: 0;
 }
 
 .card-tray {
@@ -44,4 +269,36 @@ button:focus-visible {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.card-button {
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Cards press down when tapped, so every tap gets clear feedback. */
+.card-button:hover:not(:disabled) > * {
+  transform: translateY(-2px);
+}
+
+.card-button:active:not(:disabled) > * {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--card-shadow);
+}
+
+.card-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .go-button,
+  .card-button > * {
+    transition: none;
+  }
 }

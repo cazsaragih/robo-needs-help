@@ -1,0 +1,56 @@
+.robo {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.face {
+  flex: none;
+  width: 3.25rem;
+  height: 3.4rem;
+}
+
+.bubble {
+  position: relative;
+  margin: 0 0 0 0.5rem;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--line);
+  border-radius: 1.1rem;
+  background: var(--panel);
+  box-shadow: 0 4px 0 var(--line);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* The bubble's tail, pointing at Robo. */
+.bubble::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -11px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 2px solid var(--line);
+  border-left: 2px solid var(--line);
+  background: var(--panel);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+@media (max-width: 600px) {
+  .face {
+    width: 2.4rem;
+    height: 2.5rem;
+  }
+
+  .bubble {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+  }
+}
+
+.bubble[data-empty='true'] {
+  visibility: hidden;
+}

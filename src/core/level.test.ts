@@ -1,11 +1,18 @@
 import { describe, expect, test } from 'vitest'
 import { isReached, playLevel } from './level.ts'
 import type { Level } from './level.ts'
-import { doSkill } from './skills.ts'
+import { doAction, doSkill } from './skills.ts'
 import { riverSkillBook, riverWorld } from './test-fixtures.ts'
 
 function riverLevel(): Level {
-  return { goal: 'cross the river', start: riverWorld(), target: { roboAt: 'farBank' }, cards: [] }
+  return {
+    goal: 'cross the river',
+    start: riverWorld(),
+    target: { roboAt: 'farBank' },
+    checks: { 'find a log': { seen: ['log'] } },
+    map: {},
+    cards: [],
+  }
 }
 
 describe('playLevel', () => {
@@ -23,6 +30,15 @@ describe('playLevel', () => {
     const outcome = playLevel(riverLevel(), book)
 
     expect(outcome).toMatchObject({ kind: 'notThereYet', world: { roboAt: 'riverbank' } })
+  })
+
+  test('is stuck when an idea does not do what it should', () => {
+    const book = riverSkillBook()
+    book['find a log'] = [doAction({ kind: 'move', to: 'forest' })] // forgot to look
+
+    const outcome = playLevel(riverLevel(), book)
+
+    expect(outcome).toMatchObject({ kind: 'stuck', failure: { kind: 'notDone', skill: 'find a log' } })
   })
 
   test('is stuck when the run fails', () => {
@@ -43,6 +59,14 @@ describe('isReached', () => {
   test('checks where items are', () => {
     expect(isReached(world, { items: { log: 'forest' } })).toBe(true)
     expect(isReached(world, { items: { log: 'riverbank' } })).toBe(false)
+  })
+
+  test('checks which items Robo has seen', () => {
+    const looked = { ...world, items: { log: { at: 'forest', hidden: false } } }
+
+    expect(isReached(world, { seen: ['log'] })).toBe(false)
+    expect(isReached(looked, { seen: ['log'] })).toBe(true)
+    expect(isReached(looked, { seen: ['boat'] })).toBe(false)
   })
 
   test('needs every part of the target to be true', () => {
